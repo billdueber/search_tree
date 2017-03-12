@@ -2,6 +2,7 @@ require 'search_tree/payload'
 require 'delegate'
 
 require 'dry/initializer'
+require 'dry/equalizer'
 
 
 module SearchTree
@@ -21,6 +22,9 @@ module SearchTree
 
   class GenericNode < SimpleDelegator
 
+    include Dry::Equalizer(:payload, :annotations)
+
+
 
     extend Forwardable
     def_delegators :@payload, :to_s, :pretty_print
@@ -36,6 +40,7 @@ module SearchTree
       __setobj__(@annotations)
       self
     end
+
 
     def _parts
       if annotations.empty?
@@ -62,12 +67,6 @@ module SearchTree
       :generic
     end
 
-
-    def dup
-      n = self.class.new(self.payload.dup, @annotations.dup).set_wrapper(wrapper)
-    end
-
-
     def and(other)
       AndNode.new(left_child:  self.dup,
                   right_child: wrapper.(other)).set_wrapper(wrapper)
@@ -81,9 +80,9 @@ module SearchTree
 
     def not
       if node_type == :not
-        self.payload
+        wrapper.(payload).set_wrapper(wrapper)
       else
-        NotNode.new(only_child: self.dup)
+        NotNode.new(only_child: self)
       end
     end
 
@@ -117,6 +116,8 @@ module SearchTree
       end
     end
 
+    
+
 
   end
 
@@ -126,6 +127,13 @@ module SearchTree
       p = Payload::Binary.new(left_child: left_child, right_child: right_child)
       super(p, kwargs)
     end
+
+    def dup(**kwargs)
+      anno = annotations.merge(kwargs)
+      self.class.new(left_child: payload.left_child.dup, right_child: payload.right_child.dup, **anno).set_wrapper(wrapper)
+    end
+
+    alias_method :annotate_with, :dup
 
 
     def node_type
@@ -145,10 +153,17 @@ module SearchTree
       super(p, kwargs)
     end
 
-
     def node_type
       :not
     end
+
+    def dup(**kwargs)
+      anno = annotations.merge(kwargs)
+      self.class.new(only_child: payload, **anno).set_wrapper(wrapper)
+    end
+    alias_method :annotate_with, :dup
+
+
   end
 
   class LeafNode < GenericNode
@@ -157,8 +172,19 @@ module SearchTree
     end
 
     def _parts
-      payload
+      if annotations.empty?
+        payload
+      else
+        [payload, annotations]
+      end
     end
+
+    def dup(**kwargs)
+      anno = annotations.merge(kwargs)
+      self.class.new(payload, **anno).set_wrapper(wrapper)
+    end
+    alias_method :annotate_with, :dup
+
 
 
     alias_method :value, :payload
