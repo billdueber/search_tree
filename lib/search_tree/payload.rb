@@ -47,7 +47,7 @@ module SearchTree
       end
 
       def dup
-        self.class.new(only_child: only_child)
+        self.class.new(only_child: only_child.dup)
       end
     end
   end

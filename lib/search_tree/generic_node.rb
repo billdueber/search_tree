@@ -1,5 +1,5 @@
 require 'search_tree/payload'
-require 'delegate'
+require 'forwardable'
 
 require 'dry/initializer'
 require 'dry/equalizer'
