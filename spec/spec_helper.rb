@@ -8,5 +8,11 @@ require 'minitest/autorun'
 
 # Add for use within RubyMine
 require 'minitest/reporters'
-MiniTest::Reporters.use!
+if ENV['RM_INFO'] =~ /\S/
+  puts "RUNNING UNDER RUBYMINE"
+  MiniTest::Reporters.use!
+else
+  # MiniTest::Reporters.use! [Minitest::Reporters::SpecReporter.new(color: true)]
+end
+
 

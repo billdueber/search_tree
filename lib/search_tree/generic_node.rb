@@ -14,32 +14,37 @@ module SearchTree
   class AndNode < GenericNode; end
   class OrNode < AndNode; end
   class NotNode < GenericNode; end
-  class LeafNode < GenericNode; end
 
-  IDENTITY_FUNCTION = ->(x) { x.kind_of?(GenericNode) ? x : LeafNode.new(x) }
+  LEAF_WRAPPER = ->(x) { x.kind_of?(GenericNode) ? x : LeafNode.new(x) }
 
 
 
   class GenericNode < SimpleDelegator
 
-    include Dry::Equalizer(:payload, :annotations)
+    include Dry::Equalizer(:node_type, :payload, :annotations)
 
 
 
     extend Forwardable
-    def_delegators :@payload, :to_s, :pretty_print
+    def_delegators :@payload, :to_s, :pretty_print, :left_child, :right_child, :only_child
 
     attr_reader :payload, :wrapper, :annotations
 
 
 
-    def initialize(payload, **kwargs)
+    def initialize(payload, wrapper: LEAF_WRAPPER, **kwargs)
       @payload     = payload
-      @wrapper     = IDENTITY_FUNCTION
+      @wrapper     = wrapper
       @annotations = {}.merge(kwargs)
       __setobj__(@annotations)
       self
     end
+
+    def dup(**kwargs)
+      anno = annotations.merge(kwargs)
+      self.class.new(payload, **anno).set_wrapper(wrapper)
+    end
+    alias_method :annotate_with, :dup
 
 
     def _parts
@@ -50,9 +55,9 @@ module SearchTree
       end
     end
 
-    def inspect
-      _parts.to_s
-    end
+    # def inspect
+    #   _parts.to_s
+    # end
 
     def pretty_print(q)
       _parts.pretty_print(q)
@@ -80,7 +85,7 @@ module SearchTree
 
     def not
       if node_type == :not
-        wrapper.(payload).set_wrapper(wrapper)
+        wrapper.(only_child).set_wrapper(wrapper)
       else
         NotNode.new(only_child: self)
       end
@@ -117,7 +122,29 @@ module SearchTree
     end
 
 
+    # Create a simple string of the form
+    # p1 AND (p2 AND (p3 OR p4)), just relying on the
+    # #simple_string method of the various nodes.
+    #
+    # We're explicitly ignoring the annotations.
+    # That's the "simple" part
+    #
+    # Need to be overridden for the node types
+    def simple_string
+      payload.to_s
+    end
 
+    # Make #as_string strip off any outer parens,
+    # because it looks better
+    OUTER_PARENS = /\A\((.*)\)\Z/
+    def as_string
+      ss = simple_string
+      if m = OUTER_PARENS.match(ss)
+        m[1]
+      else
+        ss
+      end
+    end
 
   end
 
@@ -139,12 +166,21 @@ module SearchTree
     def node_type
       :and
     end
+
+    def simple_string
+      "(#{left_child.simple_string} AND #{right_child.simple_string})"
+    end
   end
 
   class OrNode < AndNode
     def node_type
       :or
     end
+
+    def simple_string
+      "(#{left_child.simple_string} OR #{right_child.simple_string})"
+    end
+
   end
 
   class NotNode < GenericNode
@@ -163,10 +199,18 @@ module SearchTree
     end
     alias_method :annotate_with, :dup
 
+    def simple_string
+      "(NOT #{payload.only_child.simple_string})"
+    end
+
 
   end
 
+  # Note that unlike the other node types, a leaf node's
+  # payload is the actual value, not a Unary or Binary payload
   class LeafNode < GenericNode
+
+
     def node_type
       :leaf
     end
@@ -179,15 +223,13 @@ module SearchTree
       end
     end
 
-    def dup(**kwargs)
-      anno = annotations.merge(kwargs)
-      self.class.new(payload, **anno).set_wrapper(wrapper)
-    end
-    alias_method :annotate_with, :dup
-
-
-
     alias_method :value, :payload
+
+    def simple_string
+      payload.to_s
+    end
+
+
   end
 
 
