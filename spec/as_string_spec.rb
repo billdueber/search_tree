@@ -52,5 +52,9 @@ describe "simple string representations" do
     it "works with NOT" do
       assert_equal 'one OR (NOT (two AND three))', (@one | !(@two & @three)).as_string
     end
+
+    it "works with double-NOT and a complex tree" do
+      assert_equal "one OR (NOT (two AND three))", (!(!(@one | !(@two & @three)))).as_string
+    end
   end
 end

@@ -57,7 +57,7 @@
       <RTEST_RUN_CONFIG_SETTINGS_ID NAME="RUNNER_OPTIONS" VALUE="" />
       <method />
     </configuration>
-    <configuration default="false" name="All tests in spec: search_tree" type="TestUnitRunConfigurationType" factoryName="Test::Unit/Shoulda/Minitest" temporary="true">
+    <configuration default="false" name="All tests in spec: search_tree" type="TestUnitRunConfigurationType" factoryName="Test::Unit/Shoulda/Minitest">
       <predefined_log_file id="RUBY_TESTUNIT" enabled="true" />
       <module name="search_tree" />
       <RTEST_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift) -Ilib" />
@@ -86,7 +86,7 @@
       <RTEST_RUN_CONFIG_SETTINGS_ID NAME="RUNNER_OPTIONS" VALUE="" />
       <method />
     </configuration>
-    <configuration default="false" name="IRB console: search_tree" type="IrbRunConfigurationType" factoryName="IRB console" temporary="true">
+    <configuration default="false" name="IRB console: search_tree" type="IrbRunConfigurationType" factoryName="IRB console">
       <module name="search_tree" />
       <IRB_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
       <IRB_RUN_CONFIG NAME="WORK DIR" VALUE="$MODULE_DIR$" />
