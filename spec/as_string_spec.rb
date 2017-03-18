@@ -30,6 +30,10 @@ describe "simple string representations" do
       assert_equal 'NOT six', (!@six).as_string
     end
 
+    it "works with NOT on a pair" do
+      assert_equal "NOT (six AND five)", (!(@six & @five)).as_string
+    end
+
   end
 
   describe "more complex trees" do
@@ -46,7 +50,7 @@ describe "simple string representations" do
     end
 
     it "works with NOT" do
-      assert_equal 'one OR (NOT (two AND three))', (@one | !@two & @three).as_string
+      assert_equal 'one OR (NOT (two AND three))', (@one | !(@two & @three)).as_string
     end
   end
 end

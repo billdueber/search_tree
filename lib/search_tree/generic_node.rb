@@ -195,7 +195,7 @@ module SearchTree
 
     def dup(**kwargs)
       anno = annotations.merge(kwargs)
-      self.class.new(only_child: payload, **anno).set_wrapper(wrapper)
+      self.class.new(only_child: payload.only_child, **kwargs).set_wrapper(wrapper)
     end
     alias_method :annotate_with, :dup
 
