@@ -17,7 +17,21 @@ module SearchTree
 
   LEAF_WRAPPER = ->(x) { x.kind_of?(GenericNode) ? x : LeafNode.new(x) }
 
+  class DefaultFactory
+    def wrap(x)
+      if x.kind_of? GenericNode
+        x
+      else
+        self.leafNode(x)
+      end
+    end
 
+    def andNode(left_child:, right_child:, **kwargs)
+      AndNode.new(left_child: left_child, right_child: right_child, **kwargs)
+    end
+  end
+
+  DEFAULT_FACTORY = DefaultFactory.new
 
   class GenericNode < SimpleDelegator
 
@@ -28,14 +42,15 @@ module SearchTree
     extend Forwardable
     def_delegators :@payload, :to_s, :pretty_print, :left_child, :right_child, :only_child
 
-    attr_reader :payload, :wrapper, :annotations
+    attr_reader :payload, :wrapper, :annotations, :factory
 
 
 
-    def initialize(payload, wrapper: LEAF_WRAPPER, **kwargs)
+    def initialize(payload, wrapper: LEAF_WRAPPER, factory: DEFAULT_FACTORY, **kwargs)
       @payload     = payload
       @wrapper     = wrapper
       @annotations = {}.merge(kwargs)
+      @factory = factory
       __setobj__(@annotations)
       self
     end
@@ -74,18 +89,18 @@ module SearchTree
 
     def and(other)
       AndNode.new(left_child:  self.dup,
-                  right_child: wrapper.(other)).set_wrapper(wrapper)
+                  right_child: factory.wrap(other)).set_wrapper(wrapper)
     end
 
 
     def or(other)
       OrNode.new(left_child:  self.dup,
-                 right_child: wrapper.(other)).set_wrapper(wrapper)
+                 right_child: factory.wrap(other)).set_wrapper(wrapper)
     end
 
     def not
       if node_type == :not
-        wrapper.(only_child).set_wrapper(wrapper)
+        factory.wrap(only_child).set_wrapper(wrapper)
       else
         NotNode.new(only_child: self)
       end
