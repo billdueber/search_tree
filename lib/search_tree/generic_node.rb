@@ -20,11 +20,11 @@ module SearchTree
   # * or_node(left_child:, right_child:, **kwargs)
   # * leaf_node(payload, **kwargs)
   # * not_node(only_child:, **kwargs)
-  # * negate(node)
-  # * wrap(value) -- always returns a node
+  # * negate(node, **kwargs)
+  # * wrap(value, **kwargs) -- always returns a node
 
   class DefaultFactory
-    def wrap(x)
+    def wrap(x, **kwargs)
       if x.kind_of? GenericNode
         x
       else
@@ -41,15 +41,19 @@ module SearchTree
     end
 
     def not_node(only_child:, **kwargs)
-      NotNode.new(only_child: wrap(only_child))
+      NotNode.new(only_child: wrap(only_child), factory: self, **kwargs)
     end
 
-    def negate(node)
+    def negate(node, **kwargs)
       if node.node_type == :not
-        wrap(node.only_child)
+        wrap(node.only_child, **kwargs)
       else
-        not_node(only_child: node)
+        not_node(only_child: node, factory: self, **kwargs)
       end
+    end
+
+    def leaf_node(payload, **kwargs)
+      LeafNode.new(payload, factory: self, **kwargs)
     end
 
   end
@@ -60,14 +64,10 @@ module SearchTree
 
     include Dry::Equalizer(:node_type, :payload, :annotations)
 
-
-
     extend Forwardable
     def_delegators :@payload, :to_s, :pretty_print, :left_child, :right_child, :only_child
 
     attr_reader :payload, :annotations, :factory
-
-
 
     def initialize(payload, factory: DEFAULT_FACTORY, **kwargs)
       @payload     = payload
@@ -92,9 +92,6 @@ module SearchTree
       end
     end
 
-    # def inspect
-    #   _parts.to_s
-    # end
 
     def pretty_print(q)
       _parts.pretty_print(q)
@@ -104,6 +101,10 @@ module SearchTree
     def node_type
       :generic
     end
+
+
+    # Provide mechanisms to combine nodes
+    # using and/or/not
 
     def and(other)
       factory.and_node(left_child:  self.dup,
@@ -130,7 +131,7 @@ module SearchTree
     # Allow any node to spit out a leaf
 
     def new_leaf(payload, **kwargs)
-      LeafNode.new(payload, **kwargs)
+      factory.leaf_node(payload, **kwargs)
     end
 
     # Get the left-to-right values from the leaves
