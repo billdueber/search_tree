@@ -22,12 +22,12 @@ module SearchTree
       if x.kind_of? GenericNode
         x
       else
-        self.leafNode(x)
+        self.leaf_node(x)
       end
     end
 
-    def andNode(left_child:, right_child:, **kwargs)
-      AndNode.new(left_child: left_child, right_child: right_child, **kwargs)
+    def and_node(left_child:, right_child:, **kwargs)
+      AndNode.new(left_child: wrap(left_child), right_child: wrap(right_child), factory: self, **kwargs)
     end
   end
 
@@ -46,7 +46,7 @@ module SearchTree
 
 
 
-    def initialize(payload, wrapper: LEAF_WRAPPER, factory: DEFAULT_FACTORY, **kwargs)
+    def initialize(payload, factory: DEFAULT_FACTORY, **kwargs)
       @payload     = payload
       @wrapper     = wrapper
       @annotations = {}.merge(kwargs)
@@ -79,7 +79,7 @@ module SearchTree
     end
 
     def set_wrapper(wr)
-      @wrapper = wr
+      # @wrapper = wr
       self
     end
 
@@ -88,8 +88,8 @@ module SearchTree
     end
 
     def and(other)
-      AndNode.new(left_child:  self.dup,
-                  right_child: factory.wrap(other)).set_wrapper(wrapper)
+      factory.and_node(left_child:  self.dup,
+                      right_child: other)
     end
 
 
