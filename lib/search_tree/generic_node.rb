@@ -15,6 +15,14 @@ module SearchTree
   class OrNode < AndNode; end
   class NotNode < GenericNode; end
 
+  # A factory has to implement
+  # * and_node(left_child:, right_child:, **kwargs)
+  # * or_node(left_child:, right_child:, **kwargs)
+  # * leaf_node(payload, **kwargs)
+  # * not_node(only_child:, **kwargs)
+  # * negate(node)
+  # * wrap(value) -- always returns a node
+
   class DefaultFactory
     def wrap(x)
       if x.kind_of? GenericNode
