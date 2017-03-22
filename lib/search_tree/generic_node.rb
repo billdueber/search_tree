@@ -81,7 +81,7 @@ module SearchTree
       anno = annotations.merge(kwargs)
       self.class.new(payload, **anno)
     end
-    alias_method :annotate_with, :dup
+    alias_method :annotated_with, :dup
 
 
     def _parts
