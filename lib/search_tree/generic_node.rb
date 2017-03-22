@@ -57,7 +57,7 @@ module SearchTree
 
     def dup(**kwargs)
       anno = annotations.merge(kwargs)
-      self.class.new(payload, **anno).set_wrapper(wrapper)
+      self.class.new(payload, **anno)
     end
     alias_method :annotate_with, :dup
 
@@ -78,7 +78,7 @@ module SearchTree
       _parts.pretty_print(q)
     end
 
-    def set_wrapper(wr)
+    def
       # @wrapper = wr
       self
     end
@@ -95,12 +95,12 @@ module SearchTree
 
     def or(other)
       OrNode.new(left_child:  self.dup,
-                 right_child: factory.wrap(other)).set_wrapper(wrapper)
+                 right_child: factory.wrap(other))
     end
 
     def not
       if node_type == :not
-        factory.wrap(only_child).set_wrapper(wrapper)
+        factory.wrap(only_child)
       else
         NotNode.new(only_child: self)
       end
@@ -117,12 +117,13 @@ module SearchTree
     # wrapper passed along
 
     def new_leaf(payload, **kwargs)
-      LeafNode.new(payload, **kwargs).set_wrapper(wrapper)
+      LeafNode.new(payload, **kwargs)
     end
 
     # And something that looks like a factory
     def self.factory(wrapper: IDENTITY_FUNCTION)
-      self.new(:no_payload_factory_only).set_wrapper(wrapper)
+      # self.new(:no_payload_factory_only)
+      DEFAULT_FACTORY
     end
 
     # Get the left-to-right values from the leaves
@@ -172,7 +173,7 @@ module SearchTree
 
     def dup(**kwargs)
       anno = annotations.merge(kwargs)
-      self.class.new(left_child: payload.left_child.dup, right_child: payload.right_child.dup, **anno).set_wrapper(wrapper)
+      self.class.new(left_child: payload.left_child.dup, right_child: payload.right_child.dup, **anno)
     end
 
     alias_method :annotate_with, :dup
@@ -210,7 +211,7 @@ module SearchTree
 
     def dup(**kwargs)
       anno = annotations.merge(kwargs)
-      self.class.new(only_child: payload.only_child, **kwargs).set_wrapper(wrapper)
+      self.class.new(only_child: payload.only_child, **kwargs)
     end
     alias_method :annotate_with, :dup
 
