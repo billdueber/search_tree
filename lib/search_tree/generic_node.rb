@@ -120,12 +120,6 @@ module SearchTree
       LeafNode.new(payload, **kwargs)
     end
 
-    # And something that looks like a factory
-    def self.factory(wrapper: IDENTITY_FUNCTION)
-      # self.new(:no_payload_factory_only)
-      DEFAULT_FACTORY
-    end
-
     # Get the left-to-right values from the leaves
     # Requires that you know that the payloads classes
     # all implement #values as well, which kinda smells
