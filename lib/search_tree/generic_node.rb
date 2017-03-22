@@ -15,8 +15,6 @@ module SearchTree
   class OrNode < AndNode; end
   class NotNode < GenericNode; end
 
-  LEAF_WRAPPER = ->(x) { x.kind_of?(GenericNode) ? x : LeafNode.new(x) }
-
   class DefaultFactory
     def wrap(x)
       if x.kind_of? GenericNode
@@ -42,13 +40,12 @@ module SearchTree
     extend Forwardable
     def_delegators :@payload, :to_s, :pretty_print, :left_child, :right_child, :only_child
 
-    attr_reader :payload, :wrapper, :annotations, :factory
+    attr_reader :payload, :annotations, :factory
 
 
 
     def initialize(payload, factory: DEFAULT_FACTORY, **kwargs)
       @payload     = payload
-      @wrapper     = wrapper
       @annotations = {}.merge(kwargs)
       @factory = factory
       __setobj__(@annotations)
@@ -78,10 +75,6 @@ module SearchTree
       _parts.pretty_print(q)
     end
 
-    def
-      # @wrapper = wr
-      self
-    end
 
     def node_type
       :generic
@@ -113,8 +106,7 @@ module SearchTree
     alias_method :!, :not
 
 
-    # Allow any node to spit out a leaf with the
-    # wrapper passed along
+    # Allow any node to spit out a leaf
 
     def new_leaf(payload, **kwargs)
       LeafNode.new(payload, **kwargs)
