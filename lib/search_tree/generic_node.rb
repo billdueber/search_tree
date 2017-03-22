@@ -27,6 +27,23 @@ module SearchTree
     def and_node(left_child:, right_child:, **kwargs)
       AndNode.new(left_child: wrap(left_child), right_child: wrap(right_child), factory: self, **kwargs)
     end
+
+    def or_node(left_child:, right_child:, **kwargs)
+      OrNode.new(left_child: wrap(left_child), right_child: wrap(right_child), factory: self, **kwargs)
+    end
+
+    def not_node(only_child:, **kwargs)
+      NotNode.new(only_child: wrap(only_child))
+    end
+
+    def negate(node)
+      if node.node_type == :not
+        wrap(node.only_child)
+      else
+        not_node(only_child: node)
+      end
+    end
+
   end
 
   DEFAULT_FACTORY = DefaultFactory.new
@@ -87,16 +104,12 @@ module SearchTree
 
 
     def or(other)
-      OrNode.new(left_child:  self.dup,
-                 right_child: factory.wrap(other))
+      factory.or_node(left_child:  self.dup,
+                      right_child: other)
     end
 
     def not
-      if node_type == :not
-        factory.wrap(only_child)
-      else
-        NotNode.new(only_child: self)
-      end
+      factory.negate(self)
     end
 
     # Alias as appropriate
