@@ -117,15 +117,17 @@ module SearchTree
                       right_child: other)
     end
 
-    def not
+    def negate
       factory.negate(self)
     end
+
 
     # Alias as appropriate
 
     alias_method :&, :and
     alias_method :|, :or
-    alias_method :!, :not
+    alias_method :!, :negate
+    alias_method :not, :negate
 
 
     # Allow any node to spit out a leaf

@@ -44,7 +44,7 @@ describe "node creation and combination" do
 
   describe "simple NOT stuff" do
     it "will NOT a leaf" do
-      assert_equal :not, (@l.not.node_type)
+      assert_equal :not, (@l.negate.node_type)
     end
 
     it "works with ! for NOT" do
