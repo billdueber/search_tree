@@ -8,6 +8,8 @@ module SearchTree::Factory
     # the annotations object, we can just go ahead
     # and define a #field (aliased as `#in`) method
     module FieldedAnnotation
+
+      DEFAULT_BOOST = 1
       FIELD = :_field
       BOOST = :_boost
 
@@ -17,6 +19,7 @@ module SearchTree::Factory
 
       def field=(v)
         self[FIELD] = v
+        self
       end
 
       def boost
@@ -25,6 +28,13 @@ module SearchTree::Factory
 
       def boost=(v)
         self[BOOST] = v
+        self
+      end
+
+      def in(field, with_boost: DEFAULT_BOOST)
+        self.field = field
+        self.boost = with_boost
+        self
       end
 
     end
