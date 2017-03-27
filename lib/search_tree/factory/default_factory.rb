@@ -1,32 +1,41 @@
 require_relative '../node'
 
-# A factory has to implement
-# * and_node(left_child:, right_child:, **kwargs)
-# * or_node(left_child:, right_child:, **kwargs)
-# * leaf_node(payload, **kwargs)
-# * not_node(only_child:, **kwargs)
-# * negate(node, **kwargs)
-# * wrap(value, **kwargs) -- always returns a node
-
 module SearchTree::Factory
+
+  # A factory has to implement
+  # * and_node(left_child:, right_child:, **kwargs)
+  # * or_node(left_child:, right_child:, **kwargs)
+  # * leaf_node(payload, **kwargs)
+  # * not_node(only_child:, **kwargs)
+  # * negate(node, **kwargs)
+  # * wrap(value, **kwargs) -- always returns a node
+  #
+  # See the FieldedSearchFactory for how to implement
+  # extensions to the default -- we just mix in a
+  # module with the methods you want.
   class DefaultFactory
+
+    attr_reader :mixin
+
+    def initialize(mixin: nil)
+      @mixin = mixin
+    end
+
     def wrap(x, **kwargs)
       if x.kind_of? SearchTree::GenericNode
-        x
+        extend_node(x)
       else
         self.leaf_node(x)
       end
     end
 
-    def extend_with_module
-      nil
-    end
-
     def extend_node(n)
-      if extend_with_module
-        n.extend(extend_with_module)
+      if mixin and !(n.singleton_class.included_modules.include? mixin)
+        n.extend(mixin)
+        n
+      else
+        n
       end
-      n
     end
 
     def and_node(left_child:, right_child:, **kwargs)
@@ -45,7 +54,7 @@ module SearchTree::Factory
       if node.node_type == :not
         wrap(node.only_child, **kwargs)
       else
-        not_node(only_child: node, factory: self, **kwargs)
+        not_node(only_child: wrap(node), factory: self, **kwargs)
       end
     end
 

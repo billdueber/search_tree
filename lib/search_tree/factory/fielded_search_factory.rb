@@ -1,17 +1,25 @@
 require_relative 'default_factory'
 
 module SearchTree::Factory
-  class FieldedSearchFactory < DefaultFactory
+  class FieldedSearchFactory
     # Now let's do a fielded factory -- where a node can
     # keep track of the field it's searching inside.
     # Since a node delegates any unknonwn methods to
     # the annotations object, we can just go ahead
-    # and define a #field (aliased as `#in`) method
+    # and define #field and #boost (aliased as `#in`) methods
+    #
+    # FieldedAnnotation is pushed into a default factory
+    # and used to extend all the created objects.
+    #
+    # Note that all the data is kept in the annotations hash,
+    # which makes all the duplication and such continue to work.
     module FieldedAnnotation
 
       DEFAULT_BOOST = 1
       FIELD = :_field
       BOOST = :_boost
+
+      attr_reader :field2
 
       def field
         self[FIELD]
@@ -19,6 +27,7 @@ module SearchTree::Factory
 
       def field=(v)
         self[FIELD] = v
+        @field2 = v
         self
       end
 
@@ -37,10 +46,24 @@ module SearchTree::Factory
         self
       end
 
+
+      # Need to override simple_string to display
+      # the field/boost
+      def simple_string
+        str = super
+        if field
+          "#{field}^#{boost}:(#{str})"
+        else
+          str
+        end
+      end
     end
 
-    def extend_with_module
-      FieldedAnnotation
+
+    # And override .new so to use the FieldedAnnotation
+    # module as a mixin
+    def self.new
+      DefaultFactory.new(mixin: FieldedAnnotation)
     end
 
 
