@@ -1,8 +1,8 @@
 require 'search_tree/payload'
 require 'forwardable'
 
-require 'dry/initializer'
 require 'dry/equalizer'
+require 'dry-initializer'
 
 
 module SearchTree
@@ -56,7 +56,16 @@ module SearchTree
       LeafNode.new(payload, factory: self, **kwargs)
     end
 
+    # The annotation container has to support
+    # #merge with a set of keyword arguments.
+    # Everything else is up to the
+    # specific implementation
+    def new_annotation_container
+      {}
+    end
   end
+
+
 
   DEFAULT_FACTORY = DefaultFactory.new
 
@@ -71,7 +80,7 @@ module SearchTree
 
     def initialize(payload, factory: DEFAULT_FACTORY, **kwargs)
       @payload     = payload
-      @annotations = {}.merge(kwargs)
+      @annotations = factory.new_annotation_container.merge(kwargs)
       @factory = factory
       __setobj__(@annotations)
       self
@@ -79,7 +88,7 @@ module SearchTree
 
     def dup(**kwargs)
       anno = annotations.merge(kwargs)
-      self.class.new(payload, **anno)
+      self.class.new(payload, factory: factory, **anno)
     end
     alias_method :annotated_with, :dup
 
@@ -127,7 +136,7 @@ module SearchTree
     alias_method :&, :and
     alias_method :|, :or
     alias_method :!, :negate
-    alias_method :not, :negate
+    alias_method :not, :negate # Does this make sense?
 
 
     # Allow any node to spit out a leaf
@@ -259,5 +268,64 @@ module SearchTree
   end
 
 
+  # Now let's do a fielded factory -- where a node can
+  # keep track of the field it's searching inside.
+  # Since a node delegates any unknonwn methods to
+  # the annotations object, we can just go ahead
+  # and define a #field (aliased as `#in`) method
 
+
+  class FieldedFactory < DefaultFactory
+
+    class FieldedAnnotation < Hash
+      FIELD = :_field
+      BOOST = :_boost
+
+      def field
+        self[FIELD]
+      end
+
+      def field=(v)
+        self[FIELD] = v
+      end
+
+      def boost
+        self[BOOST]
+      end
+
+      def boost=(v)
+        self[BOOST] = v
+      end
+
+    end
+
+    def new_annotation_container
+      FieldedAnnotation.new
+    end
+
+    def leaf_node(payload, **kwargs)
+      TNode.new(payload, factory: self, **kwargs)
+    end
+
+  end
+
+  # I can override the leaf, but now now do I insert these
+  # new functionality into the AND/OR/NOT nodes? Extension?
+  # Do something like the dry-rb folks and generate modules
+  # on the fly for inclusion?  use instance#extend?
+  class TNode < LeafNode
+    DEFAULT_FACTORY = FieldedFactory.new
+    DEFAULT_BOOST = :no_boost
+
+    def initialize(payload, **kwargs)
+      super(payload, factory: DEFAULT_FACTORY, **kwargs)
+    end
+
+    def in(field, boost: DEFAULT_BOOST)
+      n = self.dup
+      n.field = field
+      n.boost = boost
+      n
+    end
+  end
 end
