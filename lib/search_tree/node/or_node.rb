@@ -12,6 +12,4 @@ module SearchTree
     end
 
   end
-
-
 end

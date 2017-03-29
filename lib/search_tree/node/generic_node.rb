@@ -100,13 +100,16 @@ module SearchTree
 
     alias_method :orig_to_s, :to_s
     OUTER_PARENS = /\A\((.*)\)\Z/
-    def to_s
-      as = as_string
-      if m = OUTER_PARENS.match(as)
+    def self.strip_outer_parens(str)
+      if m = OUTER_PARENS.match(str)
         m[1]
       else
-        as
+        str
       end
+    end
+
+    def to_s
+      self.class.strip_outer_parens(as_string)
     end
 
 

@@ -1,4 +1,5 @@
 require_relative 'default_factory'
+require 'search_tree/node/generic_node'
 
 module SearchTree::Factory
   class FieldedSearchFactory
@@ -16,7 +17,6 @@ module SearchTree::Factory
     module FieldedAnnotation
 
       DEFAULT_BOOST = 1
-      NO_FIELD      = :no_field_given
       FIELD         = :_field
       BOOST         = :_boost
 
@@ -51,13 +51,13 @@ module SearchTree::Factory
       # Need to override simple_string to display
       # the field/boost
       def as_string
-        return super if field == NO_FIELD
+        return super if field.nil?
 
-        str    = super
-        prefix = if boost == DEFAULT_BOOST
-                   "#{field}^#{boost}"
-                 else
+        str    = SearchTree::GenericNode::strip_outer_parens(super)
+        prefix = if boost.nil? or boost == DEFAULT_BOOST
                    "#{field}"
+                 else
+                   "#{field}^#{boost}"
                  end
         "#{prefix}:(#{str})"
 
