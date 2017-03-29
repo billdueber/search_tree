@@ -6,8 +6,9 @@ module SearchTree
       :or
     end
 
-    def simple_string
-      "(#{left_child.simple_string} OR #{right_child.simple_string})"
+
+    def string_connector
+      'OR'
     end
 
   end

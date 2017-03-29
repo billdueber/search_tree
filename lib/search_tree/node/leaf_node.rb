@@ -24,7 +24,7 @@ module SearchTree
       payload
     end
 
-    def simple_string
+    def as_string
       payload.to_s
     end
 

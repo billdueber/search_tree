@@ -16,8 +16,9 @@ module SearchTree::Factory
     module FieldedAnnotation
 
       DEFAULT_BOOST = 1
-      FIELD = :_field
-      BOOST = :_boost
+      NO_FIELD      = :no_field_given
+      FIELD         = :_field
+      BOOST         = :_boost
 
       attr_reader :field2
 
@@ -27,7 +28,7 @@ module SearchTree::Factory
 
       def field=(v)
         self[FIELD] = v
-        @field2 = v
+        @field2     = v
         self
       end
 
@@ -49,13 +50,17 @@ module SearchTree::Factory
 
       # Need to override simple_string to display
       # the field/boost
-      def simple_string
-        str = super
-        if field
-          "#{field}^#{boost}:(#{str})"
-        else
-          str
-        end
+      def as_string
+        return super if field == NO_FIELD
+
+        str    = super
+        prefix = if boost == DEFAULT_BOOST
+                   "#{field}^#{boost}"
+                 else
+                   "#{field}"
+                 end
+        "#{prefix}:(#{str})"
+
       end
     end
 

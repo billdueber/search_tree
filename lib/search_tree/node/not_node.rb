@@ -18,8 +18,8 @@ module SearchTree
 
     alias_method :annotate_with, :dup
 
-    def simple_string
-      "(NOT #{payload.only_child.simple_string})"
+    def as_string
+      "(NOT #{payload.only_child.as_string})"
     end
 
 

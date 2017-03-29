@@ -98,29 +98,21 @@ module SearchTree
       end
     end
 
-
-    # Create a simple string of the form
-    # p1 AND (p2 AND (p3 OR p4)), just relying on the
-    # #simple_string method of the various node.
-    #
-    # We're explicitly ignoring the annotations.
-    # That's the "simple" part
-    #
-    # Need to be overridden for the node types
-    def simple_string
-      payload.to_s
-    end
-
-    # Make #as_string strip off any outer parens,
-    # because it looks better
+    alias_method :orig_to_s, :to_s
     OUTER_PARENS = /\A\((.*)\)\Z/
-    def as_string
-      ss = simple_string
-      if m = OUTER_PARENS.match(ss)
+    def to_s
+      as = as_string
+      if m = OUTER_PARENS.match(as)
         m[1]
       else
-        ss
+        as
       end
+    end
+
+
+
+    def as_string
+      orig_to_s
     end
 
   end

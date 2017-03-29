@@ -20,8 +20,12 @@ module SearchTree
       :and
     end
 
-    def simple_string
-      "(#{left_child.simple_string} AND #{right_child.simple_string})"
+    def string_connector
+      'AND'
+    end
+
+    def as_string
+      "(#{left_child.as_string} #{string_connector} #{right_child.as_string})"
     end
   end
 
