@@ -11,15 +11,15 @@ module SearchTree
         [node.payload]
       end
 
-      def transform_and(list_of_left_paylaods, list_of_right_payloads, **kwargs)
+      def transform_and(list_of_left_paylaods, list_of_right_payloads, parent:,  **kwargs)
         list_of_left_paylaods + list_of_right_payloads
       end
 
-      def transform_or(list_of_left_paylaods, list_of_right_payloads, **kwargs)
+      def transform_or(list_of_left_paylaods, list_of_right_payloads, parent:, **kwargs)
         list_of_left_paylaods + list_of_right_payloads
       end
 
-      def transform_not(list_of_negated_payloads, **kwargs)
+      def transform_not(list_of_negated_payloads, parent:, **kwargs)
         list_of_negated_payloads
       end
 

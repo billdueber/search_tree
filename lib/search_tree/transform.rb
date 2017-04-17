@@ -21,11 +21,11 @@ module SearchTree
         p = node.payload
         case node.node_type
         when :not
-          transform_not(transform(p.only_child), kwargs)
+          transform_not(transform(p.only_child), parent: node,  **kwargs)
         when :and
-          transform_and(transform(p.left_child), transform(p.right_child), kwargs)
+          transform_and(transform(p.left_child), transform(p.right_child), parent: node,  **kwargs)
         when :or
-          transform_or(transform(p.left_child), transform(p.right_child), kwargs)
+          transform_or(transform(p.left_child), transform(p.right_child), parent: node, **kwargs)
         when :leaf
           transform_leaf(node, kwargs)
         else
