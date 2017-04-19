@@ -3,7 +3,8 @@ require 'search_tree/transform'
 module SearchTree
   module Transform
     # The payload collector just returns an array of the
-    # payloads from the leaves of the tree in left-right order
+    # payloads from the leaves of the tree from a depth-first
+    # left-right order
     class PayloadCollector
       include SearchTree::Transform::Mixin
 
