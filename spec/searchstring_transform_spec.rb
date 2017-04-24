@@ -41,7 +41,6 @@ describe "SearchString transformation" do
     assert_equal "((#{p1} OR #{p2}) AND NOT (#{p3} OR #{p4}))", @ss_transform[t]
 
 
-    
 
   end
 
