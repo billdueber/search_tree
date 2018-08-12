@@ -14,8 +14,20 @@ module SearchTree
     # e.g., one could have  something like title:(good AND author:bill)
     # which is silly. Sanitation needs to be done beforehand by whatever
     # rules seem right.
+    #
+    # @TODO Write a visitor that makes sure nothing internal to a fielded node is also fielded
     class FieldedSearchString < SearchString
       include SearchTree::Transform::Mixin
+
+      # Check to make sure anything that has a field does not have
+      # an internal node that *also* has a field (to avoid things
+      # like "author:(dueber OR title:bill)")
+
+      def has_illegal_nested_fielded_searchterms?(node)
+        return false if node.field.nil?
+
+      end
+
 
       # Build a prefix of the form "title:" or "title^3"
       # when a field or field/boost are present, and an
