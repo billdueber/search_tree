@@ -32,8 +32,14 @@ module SearchTree::Factory
         self
       end
 
-      def boost
-        self[BOOST]
+      def boost(num = nil)
+        if num
+          self[BOOST] = num
+          return self
+        else
+          self[BOOST]
+        end
+
       end
 
       def boost=(v)

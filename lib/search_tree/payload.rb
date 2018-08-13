@@ -4,7 +4,7 @@ require 'dry-equalizer'
 module SearchTree
   module Payload
     class Binary
-      extend Dry::Initializer::Mixin
+      extend Dry::Initializer
       include Dry::Equalizer(:sorted_children)
 
       option :left_child
@@ -33,7 +33,7 @@ module SearchTree
 
 
     class Unary
-      extend Dry::Initializer::Mixin
+      extend Dry::Initializer
       include Dry::Equalizer(:only_child)
 
       option :only_child
