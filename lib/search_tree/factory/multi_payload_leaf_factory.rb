@@ -20,7 +20,6 @@ module SearchTree::Factory
         self
       end
 
-
       # Provide a leaf with stuff added to the payload
       #
       # @return [MultiPayloadLeaf]
@@ -34,7 +33,7 @@ module SearchTree::Factory
 
 
     def leaf_node(payload, **kwargs)
-      self.extend_node(SearchTree::Factory::MultiPayloadLeafFactory::MultiPayloadLeaf.new(payload, factory: self, **kwargs))
+      self.extend_node(self.class.new(payload, factory: self, **kwargs))
     end
 
 

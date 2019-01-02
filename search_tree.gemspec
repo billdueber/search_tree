@@ -39,6 +39,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "dry-initializer"
   spec.add_dependency 'dry-equalizer'
   spec.add_dependency 'dry-container'
+  spec.add_dependency 'hamster'
+  spec.add_dependency 'canister'
+  spec.add_dependency 'ettin'
+
+
 
 
 end
