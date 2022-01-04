@@ -1,5 +1,10 @@
 # SearchTree
 
+----
+**Deprecated and archived**. See [mlibrary/mlibrary_search_parser](https://github.com/mlibrary/mlibrary_search_parser) for a better look at the same ideas.
+
+----
+
 Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/search_tree`. To experiment with that code, run `bin/console` for an interactive prompt.
 
 TODO: Delete this and the text above, and describe your gem
